@@ -4,35 +4,45 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 using System.Web;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace CompanyManager.WebApi.Controllers
 {
-    using TModel = Models.Company;
-    using TEntity = Logic.Entities.Company;
-
+    /// <summary>
+    /// A generic controller for handling CRUD operations.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    /// <typeparam name="TEntity">The type of the entity.</typeparam>
     [Route("api/[controller]")]
     [ApiController]
-    public class CompaniesController : ControllerBase
+    public abstract class GenericController<TModel, TEntity> : ControllerBase
+        where TModel : Models.ModelObject, new()
+        where TEntity : Logic.Entities.EntityObject, new()
     {
         private const int MaxCount = 500;
 
-        protected Logic.Contracts.IContext GetContext()
-        {
-            return Logic.DataContext.Factory.CreateContext();
-        }
-        protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
-        {
-            return context.CompanySet;
-        }
-        protected TModel ToModel(TEntity entity)
-        {
-            var result = new TModel();
+        /// <summary>
+        /// Gets the context.
+        /// </summary>
+        /// <returns>The context.</returns>
+        protected abstract Logic.Contracts.IContext GetContext();
 
-            result.CopyProperties(entity);
-            return result;
-        }
+        /// <summary>
+        /// Gets the DbSet.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <returns>The DbSet.</returns>
+        protected abstract DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context);
 
+        /// <summary>
+        /// Converts an entity to a model.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>The model.</returns>
+        protected abstract TModel ToModel(TEntity entity);
+
+        /// <summary>
+        /// Gets all models.
+        /// </summary>
+        /// <returns>A list of models.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TModel>> Get()
@@ -46,6 +56,11 @@ namespace CompanyManager.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Queries models based on a predicate.
+        /// </summary>
+        /// <param name="predicate">The predicate.</param>
+        /// <returns>A list of models.</returns>
         [HttpGet("/api/[controller]/query/{predicate}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TModel>> Query(string predicate)
@@ -54,11 +69,16 @@ namespace CompanyManager.WebApi.Controllers
             var dbSet = GetDbSet(context);
             var querySet = dbSet.AsQueryable().AsNoTracking();
             var query = querySet.Where(HttpUtility.UrlDecode(predicate)).Take(MaxCount).ToArray();
-            var result = query.Select(e => ToModel(e));
+            var result = query.Select(e => ToModel(e)).ToArray();
 
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets a model by ID.
+        /// </summary>
+        /// <param name="id">The ID.</param>
+        /// <returns>The model.</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -71,6 +91,11 @@ namespace CompanyManager.WebApi.Controllers
             return result == null ? NotFound() : ToModel(result);
         }
 
+        /// <summary>
+        /// Creates a new model.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <returns>The created model.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -94,6 +119,12 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates a model by ID.
+        /// </summary>
+        /// <param name="id">The ID.</param>
+        /// <param name="model">The model.</param>
+        /// <returns>The updated model.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -119,6 +150,12 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Partially updates a model by ID.
+        /// </summary>
+        /// <param name="id">The ID.</param>
+        /// <param name="patchModel">The patch document.</param>
+        /// <returns>The updated model.</returns>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -148,6 +185,11 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a model by ID.
+        /// </summary>
+        /// <param name="id">The ID.</param>
+        /// <returns>No content.</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

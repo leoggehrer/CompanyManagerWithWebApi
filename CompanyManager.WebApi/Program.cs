@@ -8,7 +8,8 @@ namespace CompanyManager.WebApi
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                            .AddNewtonsoftJson();
 
             var app = builder.Build();
 
@@ -17,7 +18,6 @@ namespace CompanyManager.WebApi
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 
