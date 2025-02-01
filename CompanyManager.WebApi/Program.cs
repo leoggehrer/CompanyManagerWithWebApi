@@ -9,7 +9,7 @@ namespace CompanyManager.WebApi
             // Add services to the container.
 
             builder.Services.AddControllers()
-                            .AddNewtonsoftJson();
+                            .AddNewtonsoftJson();       // Add this to the controllers for PATCH-operation.
 
             var app = builder.Build();
 
