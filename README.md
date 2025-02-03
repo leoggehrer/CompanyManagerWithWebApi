@@ -2,7 +2,10 @@
 
 **Lernziele:**
 
-- Wie mit einer REST-Api Daten aus der Datenbank abgerufen werden.
+- Wie eine REST-API mit ASP.NET Core Web API erstellt, konfiguriert und mit einer SQLite-Datenbank verbunden wird.
+- Wie Daten mit LINQ und Entity Framework Core verarbeitet werden.
+- Wie Controller HTTP-Anfragen verwalten und validieren.
+
 
 **Hinweis:** Als Startpunkt wird die Vorlage [CompanyManagerWithSqlite](https://github.com/leoggehrer/CompanyManagerWithSqlite) verwendet.
 
@@ -149,7 +152,7 @@ Die Kontroller-Klassen nehmen eine zentrale Rolle innerhalb des **MVC-(Model-Vie
 | Aspekt | Beschreibung |
 |--------|--------------|
 | `ApiController` | Markiert die Klasse als Web-API-Controller. |
-| `ProductsController` | Die konkrete Klasse muss mit dem Postfix `Controller` enden. | 
+| `ProductsController` | Der Name der konkrete Klasse muss mit dem Postfix `Controller` enden. | 
 | Route("api/products")	| Definiert die Basis-URL für die API. |
 | HttpGet, HttpPost	| Spezifiziert, welche HTTP-Methoden unterstützt werden. |
 | Ok(), NotFound(), BadRequest() | Erzeugt standardisierte HTTP-Antworten. |
