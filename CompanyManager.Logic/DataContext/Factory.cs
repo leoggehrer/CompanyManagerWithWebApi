@@ -15,9 +15,20 @@ namespace CompanyManager.Logic.DataContext
         {
             var result = new CompanyContext();
 
-            result.Database.EnsureCreated();
-
             return result;
         }
+
+#if DEBUG
+        /// <summary>
+        /// Creates the database for the CompanyContext.
+        /// </summary>
+        public static void CreateDatabase()
+        {
+            var context = new CompanyContext();
+
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+        }
+#endif
     }
 }

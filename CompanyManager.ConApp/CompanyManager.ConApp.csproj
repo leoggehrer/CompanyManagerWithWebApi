@@ -19,4 +19,16 @@
     <ProjectReference Include="..\CompanyManager.Logic\CompanyManager.Logic.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Data\companies.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\customers.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\employees.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
