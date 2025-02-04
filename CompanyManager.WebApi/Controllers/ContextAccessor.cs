@@ -1,15 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CompanyManager.WebApi.Contracts;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompanyManager.WebApi.Controllers
 {
-    public class ContextAccessor<TModel, TEntity> : IDisposable
-        where TModel : Models.ModelObject, new()
+    public class ContextAccessor<TModel, TEntity> : IDisposable, IContextAccessor<TEntity> where TModel : Models.ModelObject, new()
         where TEntity : Logic.Entities.EntityObject, new()
 
     {
         #region fields
         Logic.Contracts.IContext? context = null;
-
         #endregion fields
 
         public Logic.Contracts.IContext GetContext() => context ??= Logic.DataContext.Factory.CreateContext();
