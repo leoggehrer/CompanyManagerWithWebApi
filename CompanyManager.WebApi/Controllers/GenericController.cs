@@ -88,7 +88,7 @@ namespace CompanyManager.WebApi.Controllers
             var dbSet = GetDbSet(context);
             var result = dbSet.FirstOrDefault(e => e.Id == id);
 
-            return result == null ? NotFound() : ToModel(result);
+            return result == null ? NotFound() : Ok(ToModel(result));
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace CompanyManager.WebApi.Controllers
                 dbSet.Add(entity);
                 context.SaveChanges();
 
-                return CreatedAtAction("Get", new { id = entity.Id }, ToModel(entity));
+                return CreatedAtAction("Get", new { id = entity.Id }, Ok(ToModel(entity)));
             }
             catch (Exception ex)
             {
@@ -142,7 +142,7 @@ namespace CompanyManager.WebApi.Controllers
                     entity.CopyProperties(model);
                     context.SaveChanges();
                 }
-                return entity == null ? NotFound() : ToModel(entity);
+                return entity == null ? NotFound() : Ok(ToModel(entity));
             }
             catch (Exception ex)
             {
@@ -177,7 +177,7 @@ namespace CompanyManager.WebApi.Controllers
                     entity.CopyProperties(model);
                     context.SaveChanges();
                 }
-                return entity == null ? NotFound() : ToModel(entity);
+                return entity == null ? NotFound() : Ok(ToModel(entity));
             }
             catch (Exception ex)
             {

@@ -221,7 +221,7 @@ public class CompaniesController : ControllerBase
         var dbSet = GetDbSet(context);
         var result = dbSet.FirstOrDefault(e => e.Id == id);
 
-        return result == null ? NotFound() : ToModel(result);
+        return result == null ? NotFound() : Ok(ToModel(result));
     }
 
     [HttpPost]
@@ -264,7 +264,7 @@ public class CompaniesController : ControllerBase
                 entity.CopyProperties(model);
                 context.SaveChanges();
             }
-            return entity == null ? NotFound() : ToModel(entity);
+            return entity == null ? NotFound() : Ok(ToModel(entity));
         }
         catch (Exception ex)
         {
@@ -293,7 +293,7 @@ public class CompaniesController : ControllerBase
                 entity.CopyProperties(model);
                 context.SaveChanges();
             }
-            return entity == null ? NotFound() : ToModel(entity);
+            return entity == null ? NotFound() : Ok(ToModel(entity));
         }
         catch (Exception ex)
         {
