@@ -21,6 +21,11 @@
         public string? Description { get; set; }
 
         /// <summary>
+        /// Gets or sets the customers of the company.
+        /// </summary>
+        public Logic.Contracts.ICustomer[] Customers { get; set; } = [];
+
+        /// <summary>
         /// Copies the properties from another company instance.
         /// </summary>
         /// <param name="other">The company instance to copy properties from.</param>

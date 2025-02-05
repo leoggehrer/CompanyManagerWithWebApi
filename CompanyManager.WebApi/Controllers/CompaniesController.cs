@@ -25,11 +25,15 @@ namespace CompanyManager.WebApi.Controllers
         {
             return context.CompanySet;
         }
-        protected TModel ToModel(TEntity entity)
+        protected virtual TModel ToModel(TEntity entity)
         {
             var result = new TModel();
 
             result.CopyProperties(entity);
+            if (entity.Customers != null)
+            {
+                result.Customers = entity.Customers.Select(e => Models.Customer.Create(e)).ToArray();
+            }
             return result;
         }
 
@@ -66,7 +70,7 @@ namespace CompanyManager.WebApi.Controllers
         {
             using var context = GetContext();
             var dbSet = GetDbSet(context);
-            var result = dbSet.FirstOrDefault(e => e.Id == id);
+            var result = dbSet.Include(e => e.Customers).FirstOrDefault(e => e.Id == id);
 
             return result == null ? NotFound() : Ok(ToModel(result));
         }

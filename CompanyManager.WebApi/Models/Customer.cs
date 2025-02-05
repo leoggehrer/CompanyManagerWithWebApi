@@ -33,5 +33,19 @@
             Name = other.Name;
             Email = other.Email;
         }
+
+        /// <summary>
+        /// Creates a new customer instance from an existing customer.
+        /// </summary>
+        /// <param name="customer">The customer instance to copy properties from.</param>
+        /// <returns>A new customer instance.</returns>
+        public static Customer Create(Logic.Contracts.ICustomer customer)
+        {
+            var result = new Customer();
+
+            result.CopyProperties(customer);
+            return result;
+        }
+
     }
 }

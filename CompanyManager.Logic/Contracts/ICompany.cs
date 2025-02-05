@@ -14,6 +14,9 @@
         /// </summary>
         string? Address { get; set; }
 
+        /// <summary>
+        /// Gets or sets the description of the company.
+        /// </summary>
         string? Description { get; set; }
     }
 }

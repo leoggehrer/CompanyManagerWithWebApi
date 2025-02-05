@@ -45,7 +45,7 @@ namespace CompanyManager.WebApi.Controllers
         /// <returns>A list of models.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<TModel>> Get()
+        public virtual ActionResult<IEnumerable<TModel>> Get()
         {
             using var context = GetContext();
             var dbSet = GetDbSet(context);
@@ -63,7 +63,7 @@ namespace CompanyManager.WebApi.Controllers
         /// <returns>A list of models.</returns>
         [HttpGet("/api/[controller]/query/{predicate}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<TModel>> Query(string predicate)
+        public virtual ActionResult<IEnumerable<TModel>> Query(string predicate)
         {
             using var context = GetContext();
             var dbSet = GetDbSet(context);
@@ -82,7 +82,7 @@ namespace CompanyManager.WebApi.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<TModel?> Get(int id)
+        public virtual ActionResult<TModel?> Get(int id)
         {
             using var context = GetContext();
             var dbSet = GetDbSet(context);
@@ -99,7 +99,7 @@ namespace CompanyManager.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TModel> Post([FromBody] TModel model)
+        public virtual ActionResult<TModel> Post([FromBody] TModel model)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace CompanyManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TModel> Put(int id, [FromBody] TModel model)
+        public virtual ActionResult<TModel> Put(int id, [FromBody] TModel model)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace CompanyManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<TModel> Patch(int id, [FromBody] JsonPatchDocument<TModel> patchModel)
+        public virtual ActionResult<TModel> Patch(int id, [FromBody] JsonPatchDocument<TModel> patchModel)
         {
             try
             {
@@ -194,7 +194,7 @@ namespace CompanyManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult Delete(int id)
+        public virtual ActionResult Delete(int id)
         {
             try
             {
