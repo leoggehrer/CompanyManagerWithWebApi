@@ -340,6 +340,71 @@ Hier ist eine Tabelle, die die wichtigsten HTTP-Methoden (GET, POST, PUT, DELETE
 
 Diese Tabelle gibt einen strukturierten Überblick über die verschiedenen Methoden und deren typische Verwendung in einer Web-API.
 
+#### Die Kontroller `CustomersController` und `EmployeesController` können analog zur `CompaniesController` implementiert werden.
+
+Vorgehensweise:
+
+Kopieren Sie die Klasse `CompaniesController` und benennen Sie sie in `CustomersController` um. Ändern Sie die Typen `Company` in `Customer`. Nachfolgend finden Sie die Änderungen, die Sie vornehmen müssen:
+
+```csharp
+namespace CompanyManager.WebApi.Controllers
+{
+    using TModel = Models.Customer;
+    using TEntity = Logic.Entities.Customer;
+
+    [Route("api/[controller]")]
+    [ApiController]
+    public class CustomersController : ControllerBase
+    {
+        private const int MaxCount = 500;
+
+        protected Logic.Contracts.IContext GetContext()
+        {
+            return Logic.DataContext.Factory.CreateContext();
+        }
+        protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
+        {
+            return context.CustomerSet;
+        }
+        ...
+    }
+}
+```
+
+Das gleiche Vorgehen gilt für die Klasse `EmployeesController`. Nachfolgend finden Sie die Änderungen, die Sie vornehmen müssen:
+
+```csharp
+namespace CompanyManager.WebApi.Controllers
+{
+    using TModel = Models.Employee;
+    using TEntity = Logic.Entities.Employee;
+
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EmployeesController : ControllerBase
+    {
+        private const int MaxCount = 500;
+
+        protected Logic.Contracts.IContext GetContext()
+        {
+            return Logic.DataContext.Factory.CreateContext();
+        }
+        protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
+        {
+            return context.EmployeeSet;
+        }
+        protected virtual TModel ToModel(TEntity entity)
+        {
+            var result = new TModel();
+
+            result.CopyProperties(entity);
+            return result;
+        }
+        ...
+    }
+}
+```
+
 ### Testen des Systems
 
 - Testen Sie die REST-API mit dem Programm **Postman**. Ein `GET`-Request sieht wie folgt aus:

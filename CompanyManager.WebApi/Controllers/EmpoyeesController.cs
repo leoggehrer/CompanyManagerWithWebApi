@@ -8,12 +8,12 @@ using System.Web;
 
 namespace CompanyManager.WebApi.Controllers
 {
-    using TModel = Models.Customer;
-    using TEntity = Logic.Entities.Customer;
+    using TModel = Models.Employee;
+    using TEntity = Logic.Entities.Employee;
 
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomersController : ControllerBase
+    public class EmployeesController : ControllerBase
     {
         private const int MaxCount = 500;
 
@@ -23,7 +23,7 @@ namespace CompanyManager.WebApi.Controllers
         }
         protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
         {
-            return context.CustomerSet;
+            return context.EmployeeSet;
         }
         protected virtual TModel ToModel(TEntity entity)
         {
