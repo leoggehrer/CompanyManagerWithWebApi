@@ -2,17 +2,14 @@
 {
     using TModel = Models.Employee;
     using TEntity = Logic.Entities.Employee;
+    using CompanyManager.WebApi.Contracts;
 
     public class EmployeesController : GenericController<TModel, TEntity>
     {
-        protected override Logic.Contracts.IContext GetContext()
+        public EmployeesController(IContextAccessor contextAccessor) : base(contextAccessor)
         {
-            return Logic.DataContext.Factory.CreateContext();
         }
-        protected override Microsoft.EntityFrameworkCore.DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
-        {
-            return context.EmployeeSet;
-        }
+
         protected override TModel ToModel(TEntity entity)
         {
             var result = new TModel();

@@ -1,4 +1,5 @@
 ﻿using CompanyManager.Logic.Contracts;
+using CompanyManager.WebApi.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace CompanyManager.WebApi.Controllers
@@ -8,14 +9,8 @@ namespace CompanyManager.WebApi.Controllers
 
     public class CustomersController : GenericController<TModel, TEntity>
     {
-        protected override IContext GetContext()
+        public CustomersController(IContextAccessor contextAccessor) : base(contextAccessor)
         {
-            return Logic.DataContext.Factory.CreateContext();
-        }
-
-        protected override DbSet<TEntity> GetDbSet(IContext context)
-        {
-            return context.CustomerSet;
         }
 
         protected override TModel ToModel(TEntity entity)

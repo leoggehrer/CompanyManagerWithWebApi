@@ -1,12 +1,11 @@
 ﻿using CompanyManager.Logic.Contracts;
-using CompanyManager.Logic.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CompanyManager.WebApi.Contracts
 {
-    public interface IContextAccessor<TEntity> where TEntity : EntityObject, new()
+    public interface IContextAccessor : IDisposable
     {
         IContext GetContext();
-        DbSet<TEntity>? GetDbSet();
+        DbSet<TEntity>? GetDbSet<TEntity>() where TEntity : class;
     }
 }

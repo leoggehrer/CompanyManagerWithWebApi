@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CompanyManager.WebApi.Controllers
 {
-    public class ContextAccessor<TModel, TEntity> : IDisposable, IContextAccessor<TEntity> where TModel : Models.ModelObject, new()
-        where TEntity : Logic.Entities.EntityObject, new()
-
+    public class ContextAccessor : IContextAccessor
     {
         #region fields
         Logic.Contracts.IContext? context = null;
@@ -13,7 +11,7 @@ namespace CompanyManager.WebApi.Controllers
 
         public Logic.Contracts.IContext GetContext() => context ??= Logic.DataContext.Factory.CreateContext();
 
-        public DbSet<TEntity>? GetDbSet()
+        public DbSet<TEntity>? GetDbSet<TEntity>() where TEntity : class
         {
             DbSet<TEntity>? result = default;
 
@@ -29,7 +27,6 @@ namespace CompanyManager.WebApi.Controllers
             {
                 result = GetContext().EmployeeSet as DbSet<TEntity>;
             }
-
             return result;
         }
 

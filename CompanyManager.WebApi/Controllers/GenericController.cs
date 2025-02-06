@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+﻿using CompanyManager.Logic.Contracts;
+using CompanyManager.WebApi.Contracts;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -17,20 +19,26 @@ namespace CompanyManager.WebApi.Controllers
         where TModel : Models.ModelObject, new()
         where TEntity : Logic.Entities.EntityObject, new()
     {
+        #region fields
         private const int MaxCount = 500;
+        #endregion fields
 
+        #region properties
+        protected IContextAccessor ContextAccessor { get; }
         /// <summary>
         /// Gets the context.
         /// </summary>
-        /// <returns>The context.</returns>
-        protected abstract Logic.Contracts.IContext GetContext();
-
+        protected virtual IContext Context => ContextAccessor.GetContext();
         /// <summary>
         /// Gets the DbSet.
         /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns>The DbSet.</returns>
-        protected abstract DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context);
+        protected virtual DbSet<TEntity> EntitySet => ContextAccessor.GetDbSet<TEntity>() ?? throw new Exception($"Invalid DbSet<{typeof(TEntity)}>");
+        #endregion properties
+
+        protected GenericController(IContextAccessor contextAccessor) 
+        {
+            ContextAccessor = contextAccessor;
+        }
 
         /// <summary>
         /// Converts an entity to a model.
@@ -47,8 +55,7 @@ namespace CompanyManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual ActionResult<IEnumerable<TModel>> Get()
         {
-            using var context = GetContext();
-            var dbSet = GetDbSet(context);
+            var dbSet = EntitySet;
             var querySet = dbSet.AsQueryable().AsNoTracking();
             var query = querySet.Take(MaxCount).ToArray();
             var result = query.Select(e => ToModel(e));
@@ -65,8 +72,7 @@ namespace CompanyManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public virtual ActionResult<IEnumerable<TModel>> Query(string predicate)
         {
-            using var context = GetContext();
-            var dbSet = GetDbSet(context);
+            var dbSet = EntitySet;
             var querySet = dbSet.AsQueryable().AsNoTracking();
             var query = querySet.Where(HttpUtility.UrlDecode(predicate)).Take(MaxCount).ToArray();
             var result = query.Select(e => ToModel(e)).ToArray();
@@ -84,8 +90,7 @@ namespace CompanyManager.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public virtual ActionResult<TModel?> Get(int id)
         {
-            using var context = GetContext();
-            var dbSet = GetDbSet(context);
+            var dbSet = EntitySet;
             var result = dbSet.FirstOrDefault(e => e.Id == id);
 
             return result == null ? NotFound() : Ok(ToModel(result));
@@ -103,13 +108,12 @@ namespace CompanyManager.WebApi.Controllers
         {
             try
             {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
+                var dbSet = EntitySet;
                 var entity = new TEntity();
 
                 entity.CopyProperties(model);
                 dbSet.Add(entity);
-                context.SaveChanges();
+                Context.SaveChanges();
 
                 return CreatedAtAction("Get", new { id = entity.Id }, Ok(ToModel(entity)));
             }
@@ -133,14 +137,13 @@ namespace CompanyManager.WebApi.Controllers
         {
             try
             {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
+                var dbSet = EntitySet;
                 var entity = dbSet.FirstOrDefault(e => e.Id == id);
 
                 if (entity != null)
                 {
                     entity.CopyProperties(model);
-                    context.SaveChanges();
+                    Context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));
             }
@@ -164,8 +167,7 @@ namespace CompanyManager.WebApi.Controllers
         {
             try
             {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
+                var dbSet = EntitySet;
                 var entity = dbSet.FirstOrDefault(e => e.Id == id);
 
                 if (entity != null)
@@ -175,7 +177,7 @@ namespace CompanyManager.WebApi.Controllers
                     patchModel.ApplyTo(model);
 
                     entity.CopyProperties(model);
-                    context.SaveChanges();
+                    Context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));
             }
@@ -198,14 +200,13 @@ namespace CompanyManager.WebApi.Controllers
         {
             try
             {
-                using var context = GetContext();
-                var dbSet = GetDbSet(context);
+                var dbSet = EntitySet;
                 var entity = dbSet.FirstOrDefault(e => e.Id == id);
 
                 if (entity != null)
                 {
                     dbSet.Remove(entity);
-                    context.SaveChanges();
+                    Context.SaveChanges();
                 }
                 return entity == null ? NotFound() : NoContent();
             }
