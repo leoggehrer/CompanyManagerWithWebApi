@@ -11,20 +11,39 @@ namespace CompanyManager.WebApi.Controllers
     using TModel = Models.Company;
     using TEntity = Logic.Entities.Company;
 
+    /// <summary>
+    /// Controller for managing companies.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CompaniesController : ControllerBase
     {
         private const int MaxCount = 500;
 
+        /// <summary>
+        /// Gets the context for the database operations.
+        /// </summary>
+        /// <returns>The database context.</returns>
         protected Logic.Contracts.IContext GetContext()
         {
             return Logic.DataContext.Factory.CreateContext();
         }
+
+        /// <summary>
+        /// Gets the DbSet for the company entity.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <returns>The DbSet for the company entity.</returns>
         protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
         {
             return context.CompanySet;
         }
+
+        /// <summary>
+        /// Converts a company entity to a company model.
+        /// </summary>
+        /// <param name="entity">The company entity.</param>
+        /// <returns>The company model.</returns>
         protected virtual TModel ToModel(TEntity entity)
         {
             var result = new TModel();
@@ -37,6 +56,24 @@ namespace CompanyManager.WebApi.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Converts a company model to a company entity.
+        /// </summary>
+        /// <param name="model">The company model.</param>
+        /// <param name="entity">The existing company entity, or null to create a new entity.</param>
+        /// <returns>The company entity.</returns>
+        protected virtual TEntity ToEntity(TModel model, TEntity? entity)
+        {
+            var result = entity ??= new TEntity();
+
+            result.CopyProperties(model);
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a list of companies.
+        /// </summary>
+        /// <returns>A list of company models.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TModel>> Get()
@@ -50,6 +87,11 @@ namespace CompanyManager.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Queries companies based on a predicate.
+        /// </summary>
+        /// <param name="predicate">The query predicate.</param>
+        /// <returns>A list of company models that match the predicate.</returns>
         [HttpGet("/api/[controller]/query/{predicate}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TModel>> Query(string predicate)
@@ -63,6 +105,11 @@ namespace CompanyManager.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets a company by its ID.
+        /// </summary>
+        /// <param name="id">The company ID.</param>
+        /// <returns>The company model.</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -75,6 +122,11 @@ namespace CompanyManager.WebApi.Controllers
             return result == null ? NotFound() : Ok(ToModel(result));
         }
 
+        /// <summary>
+        /// Creates a new company.
+        /// </summary>
+        /// <param name="model">The company model.</param>
+        /// <returns>The created company model.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -84,13 +136,13 @@ namespace CompanyManager.WebApi.Controllers
             {
                 using var context = GetContext();
                 var dbSet = GetDbSet(context);
-                var entity = new TEntity();
+                var entity = ToEntity(model, null);
 
                 entity.CopyProperties(model);
                 dbSet.Add(entity);
                 context.SaveChanges();
 
-                return CreatedAtAction("Get", new { id = entity.Id }, ToModel(entity));
+                return CreatedAtAction("Get", new { id = entity.Id }, entity);
             }
             catch (Exception ex)
             {
@@ -98,6 +150,12 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing company.
+        /// </summary>
+        /// <param name="id">The company ID.</param>
+        /// <param name="model">The company model.</param>
+        /// <returns>The updated company model.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -112,7 +170,8 @@ namespace CompanyManager.WebApi.Controllers
 
                 if (entity != null)
                 {
-                    entity.CopyProperties(model);
+                    model.Id = id;
+                    entity = ToEntity(model, entity);
                     context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));
@@ -123,6 +182,12 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Partially updates an existing company.
+        /// </summary>
+        /// <param name="id">The company ID.</param>
+        /// <param name="patchModel">The JSON patch document.</param>
+        /// <returns>The updated company model.</returns>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -152,6 +217,11 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a company by its ID.
+        /// </summary>
+        /// <param name="id">The company ID.</param>
+        /// <returns>No content if the deletion was successful.</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

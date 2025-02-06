@@ -11,9 +11,6 @@ namespace CompanyManager.WebApi
             builder.Services.AddControllers()
                             .AddNewtonsoftJson();       // Add this to the controllers for PATCH-operation.
 
-            // Add ContextAccessor to the services.
-            builder.Services.AddScoped<Contracts.IContextAccessor, Controllers.ContextAccessor>();
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

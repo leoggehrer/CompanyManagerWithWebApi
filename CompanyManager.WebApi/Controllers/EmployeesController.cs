@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -11,28 +11,63 @@ namespace CompanyManager.WebApi.Controllers
     using TModel = Models.Employee;
     using TEntity = Logic.Entities.Employee;
 
+    /// <summary>
+    /// Controller for managing employees.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class EmployeesController : ControllerBase
     {
         private const int MaxCount = 500;
 
+        /// <summary>
+        /// Gets the context for the database.
+        /// </summary>
+        /// <returns>The database context.</returns>
         protected Logic.Contracts.IContext GetContext()
         {
             return Logic.DataContext.Factory.CreateContext();
         }
+
+        /// <summary>
+        /// Gets the DbSet for employees.
+        /// </summary>
+        /// <param name="context">The database context.</param>
+        /// <returns>The DbSet for employees.</returns>
         protected DbSet<TEntity> GetDbSet(Logic.Contracts.IContext context)
         {
             return context.EmployeeSet;
         }
+
+        /// <summary>
+        /// Converts an entity to a model.
+        /// </summary>
+        /// <param name="entity">The entity to convert.</param>
+        /// <returns>The converted model.</returns>
         protected virtual TModel ToModel(TEntity entity)
         {
             var result = new TModel();
-
             result.CopyProperties(entity);
             return result;
         }
 
+        /// <summary>
+        /// Converts a model to an entity.
+        /// </summary>
+        /// <param name="model">The model to convert.</param>
+        /// <param name="entity">The existing entity to update, or null to create a new entity.</param>
+        /// <returns>The converted entity.</returns>
+        protected virtual TEntity ToEntity(TModel model, TEntity? entity)
+        {
+            var result = entity ??= new TEntity();
+            result.CopyProperties(model);
+            return result;
+        }
+
+        /// <summary>
+        /// Gets a list of employees.
+        /// </summary>
+        /// <returns>A list of employees.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TModel>> Get()
@@ -46,6 +81,11 @@ namespace CompanyManager.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Queries employees based on a predicate.
+        /// </summary>
+        /// <param name="predicate">The predicate to filter employees.</param>
+        /// <returns>A list of employees that match the predicate.</returns>
         [HttpGet("/api/[controller]/query/{predicate}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TModel>> Query(string predicate)
@@ -59,6 +99,11 @@ namespace CompanyManager.WebApi.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets an employee by ID.
+        /// </summary>
+        /// <param name="id">The ID of the employee.</param>
+        /// <returns>The employee with the specified ID.</returns>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -71,6 +116,11 @@ namespace CompanyManager.WebApi.Controllers
             return result == null ? NotFound() : Ok(ToModel(result));
         }
 
+        /// <summary>
+        /// Creates a new employee.
+        /// </summary>
+        /// <param name="model">The employee model to create.</param>
+        /// <returns>The created employee.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -80,7 +130,7 @@ namespace CompanyManager.WebApi.Controllers
             {
                 using var context = GetContext();
                 var dbSet = GetDbSet(context);
-                var entity = new TEntity();
+                var entity = ToEntity(model, null);
 
                 entity.CopyProperties(model);
                 dbSet.Add(entity);
@@ -94,6 +144,12 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Updates an existing employee.
+        /// </summary>
+        /// <param name="id">The ID of the employee to update.</param>
+        /// <param name="model">The updated employee model.</param>
+        /// <returns>The updated employee.</returns>
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -119,6 +175,12 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Partially updates an existing employee.
+        /// </summary>
+        /// <param name="id">The ID of the employee to update.</param>
+        /// <param name="patchModel">The patch document with the updates.</param>
+        /// <returns>The updated employee.</returns>
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -148,6 +210,11 @@ namespace CompanyManager.WebApi.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes an employee by ID.
+        /// </summary>
+        /// <param name="id">The ID of the employee to delete.</param>
+        /// <returns>No content if the deletion was successful.</returns>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
