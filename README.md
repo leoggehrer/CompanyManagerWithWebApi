@@ -24,7 +24,7 @@ Bevor mit der Umsetzung begonnen wird, sollte die Vorlage heruntergeladen und di
 - Fügen Sie das Package `Microsoft.AspNetCore.JsonPatch` 
 - und das Package `Microsoft.AspNetCore.Mvc.NewtonsoftJson`dem Projekt hinzu.
   
-Das Hinzufügen des Packages erfolgt im Konsole-Programm und die Anleitung dazu finden Sie [hier](https://github.com/leoggehrer/Slides/tree/main/NutgetInstall).
+Das Hinzufügen des Packages erfolgt im Konsolen-Programm und die Anleitung dazu finden Sie [hier](https://github.com/leoggehrer/Slides/tree/main/NugetInstall).
 
 Initialisieren Sie die `NewtonsoftJson`-Bibliothek mit der folgenden Zeile in der Klasse `Program`.
 
@@ -122,29 +122,34 @@ public abstract class ModelObject : Logic.Contracts.IIdentifiable
 }
 ```
 
-### Erstellen der Kontroller-Klassen
+### Erstellen der Controller-Klassen
 
 Die Kontroller-Klassen nehmen eine zentrale Rolle innerhalb des **MVC-(Model-View-Controller)** Musters ein. Sie sind für die Verarbeitung von HTTP-Anfragen verantwortlich und steuern die Interaktion zwischen dem Client und der Geschäftslogik der Anwendung.
 
 **Aufgaben der Kontroller-Klassen:**
 
 1. **Annahme und Verarbeitung von HTTP-Anfragen**
+
 - Ein Controller empfängt HTTP-Anfragen (z. B. GET, POST, PUT, DELETE).
 - Er analysiert die übermittelten Parameter und leitet sie an die entsprechenden Methoden weiter.
 
 2. **Auswahl und Aufruf der Geschäftslogik**
+
 - Er ruft Services oder Repositories auf, um Daten zu verarbeiten oder aus der Datenbank abzurufen.
 - Die Trennung zwischen Controller und Geschäftslogik wird durch Dependency Injection (DI) ermöglicht.
 
 3. **Verarbeitung und Validierung von Eingaben**
+
 - Ein Controller validiert die eingehenden Daten mithilfe von Modellvalidierung ([Required], [Range], [StringLength] usw.).
 - Falls die Validierung fehlschlägt, gibt er eine entsprechende Fehlermeldung zurück (400 Bad Request).
 
 4. **Erstellung von HTTP-Antworten**
+
 - Er generiert und sendet Antworten an den Client in Form von JSON oder XML.
 - Er setzt den passenden HTTP-Statuscode (200 OK, 201 Created, 404 Not Found, 500 Internal Server Error etc.).
 
 5. **Routing und Endpunktverwaltung**
+
 - Durch Attribute wie [Route] oder [HttpGet] werden Endpunkte definiert, die die Client-Anfragen steuern.
 
 **Wichtige Aspekte eines Controllers:**
@@ -490,9 +495,9 @@ namespace CompanyManager.WebApi.Controllers
 GET: https://localhost:7074/api/companies
 ```
 
-Diese Anfrage listed alle `Company`-Einträge im json-Format auf.
+Diese Anfrage listet alle `Company`-Einträge im json-Format auf.
 
-## Hilfsmitteln
+## Hilfsmittel
 
 - keine
 
