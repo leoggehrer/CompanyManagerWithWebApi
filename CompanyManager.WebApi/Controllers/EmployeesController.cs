@@ -10,6 +10,7 @@ namespace CompanyManager.WebApi.Controllers
 {
     using TModel = Models.Employee;
     using TEntity = Logic.Entities.Employee;
+    using TContract = Common.Contracts.IEmployee;
 
     /// <summary>
     /// Controller for managing employees.
@@ -47,7 +48,8 @@ namespace CompanyManager.WebApi.Controllers
         protected virtual TModel ToModel(TEntity entity)
         {
             var result = new TModel();
-            result.CopyProperties(entity);
+
+            (result as TContract).CopyProperties(entity);
             return result;
         }
 
@@ -59,8 +61,9 @@ namespace CompanyManager.WebApi.Controllers
         /// <returns>The converted entity.</returns>
         protected virtual TEntity ToEntity(TModel model, TEntity? entity)
         {
-            var result = entity ??= new TEntity();
-            result.CopyProperties(model);
+            var result = entity ?? new TEntity();
+
+            (result as TContract).CopyProperties(model);
             return result;
         }
 
@@ -132,7 +135,7 @@ namespace CompanyManager.WebApi.Controllers
                 var dbSet = GetDbSet(context);
                 var entity = ToEntity(model, null);
 
-                entity.CopyProperties(model);
+                (entity as TContract).CopyProperties(model);
                 dbSet.Add(entity);
                 context.SaveChanges();
 
@@ -164,7 +167,7 @@ namespace CompanyManager.WebApi.Controllers
 
                 if (entity != null)
                 {
-                    entity.CopyProperties(model);
+                    (entity as TContract).CopyProperties(model);
                     context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));
@@ -199,7 +202,7 @@ namespace CompanyManager.WebApi.Controllers
 
                     patchModel.ApplyTo(model);
 
-                    entity.CopyProperties(model);
+                    (entity as TContract).CopyProperties(model);
                     context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));

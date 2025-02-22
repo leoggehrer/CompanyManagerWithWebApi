@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents an employee in the company manager.
     /// </summary>
-    public class Employee : ModelObject, Logic.Contracts.IEmployee
+    public class Employee : ModelObject, Common.Contracts.IEmployee
     {
         /// <summary>
         /// Gets or sets the reference to the company.
@@ -24,20 +24,5 @@
         /// Gets or sets the email of the employee.
         /// </summary>
         public string Email { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Copies the properties from another employee object.
-        /// </summary>
-        /// <param name="other">The other employee object to copy properties from.</param>
-        /// <exception cref="ArgumentNullException">Thrown when the other object is null.</exception>
-        public virtual void CopyProperties(Logic.Contracts.IEmployee other)
-        {
-            base.CopyProperties(other);
-
-            CompanyId = other.CompanyId;
-            FirstName = other.FirstName;
-            LastName = other.LastName;
-            Email = other.Email;
-        }
     }
 }

@@ -1,12 +1,9 @@
-﻿using CompanyManager.Logic.Contracts;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace CompanyManager.Logic.Entities
+﻿namespace CompanyManager.Logic.Entities
 {
     /// <summary>
     /// Represents an employee entity.
     /// </summary>
-    public class Employee : EntityObject, IEmployee
+    public class Employee : EntityObject, Common.Contracts.IEmployee
     {
         #region properties
         /// <summary>
@@ -38,20 +35,6 @@ namespace CompanyManager.Logic.Entities
         #endregion navigation properties
 
         #region methods
-        /// <summary>
-        /// Copies properties from another employee.
-        /// </summary>
-        /// <param name="employee">The employee to copy properties from.</param>
-        public virtual void CopyProperties(IEmployee employee)
-        {
-            base.CopyProperties(employee);
-
-            CompanyId = employee.CompanyId;
-            FirstName = employee.FirstName;
-            LastName = employee.LastName;
-            Email = employee.Email;
-        }
-
         /// <summary>
         /// Returns a string representation of the employee.
         /// </summary>

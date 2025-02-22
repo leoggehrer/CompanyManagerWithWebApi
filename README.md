@@ -7,7 +7,7 @@
 - Wie Controller HTTP-Anfragen verwalten und validieren.
 
 
-**Hinweis:** Als Startpunkt wird die Vorlage [CompanyManagerWithSqlite](https://github.com/leoggehrer/CompanyManagerWithSqlite) verwendet.
+**Hinweis:** Als Startpunkt wird die Vorlage [CompanyManagerWithSettings](https://github.com/leoggehrer/CompanyManagerWithSettings) verwendet.
 
 ## Vorbereitung
 
@@ -61,32 +61,6 @@ public class Company : ModelObject, Logic.Contracts.ICompany
     /// Gets or sets the description of the company.
     /// </summary>
     public string? Description { get; set; }
-
-    /// <summary>
-    /// Copies the properties from another company instance.
-    /// </summary>
-    /// <param name="other">The company instance to copy properties from.</param>
-    public virtual void CopyProperties(Logic.Contracts.ICompany other)
-    {
-        base.CopyProperties(other);
-
-        Name = other.Name;
-        Address = other.Address;
-        Description = other.Description;
-    }
-
-    /// <summary>
-    /// Creates a new company instance from an existing company.
-    /// </summary>
-    /// <param name="company">The company instance to copy properties from.</param>
-    /// <returns>A new company instance.</returns>
-    public static Company Create(Logic.Contracts.ICompany company)
-    {
-        var result = new Company();
-
-        result.CopyProperties(company);
-        return result;
-    }
 }
 ```
 
@@ -107,18 +81,6 @@ public abstract class ModelObject : Logic.Contracts.IIdentifiable
     /// Gets or sets the unique identifier for the model object.
     /// </summary>
     public int Id { get; set; }
-
-    /// <summary>
-    /// Copies the properties from another identifiable object.
-    /// </summary>
-    /// <param name="other">The other identifiable object to copy properties from.</param>
-    /// <exception cref="ArgumentNullException">Thrown when the other object is null.</exception>
-    public virtual void CopyProperties(Logic.Contracts.IIdentifiable other)
-    {
-        if (other == null) throw new ArgumentNullException(nameof(other));
-
-        Id = other.Id;
-    }
 }
 ```
 
@@ -170,6 +132,7 @@ namespace CompanyManager.WebApi.Controllers
 {
     using TModel = Models.Company;
     using TEntity = Logic.Entities.Company;
+    using TContract = Common.Contracts.ICompany;
 
     /// <summary>
     /// Controller for managing companies.
@@ -208,10 +171,16 @@ namespace CompanyManager.WebApi.Controllers
         {
             var result = new TModel();
 
-            result.CopyProperties(entity);
+            (result as TContract).CopyProperties(entity);
             if (entity.Customers != null)
             {
-                result.Customers = entity.Customers.Select(e => Models.Customer.Create(e)).ToArray();
+                result.Customers = [.. entity.Customers.Select(e => 
+                {
+                    var result = new Models.Customer();
+
+                    (result as Common.Contracts.ICustomer).CopyProperties(e);
+                    return result;
+                })];
             }
             return result;
         }
@@ -224,9 +193,9 @@ namespace CompanyManager.WebApi.Controllers
         /// <returns>The company entity.</returns>
         protected virtual TEntity ToEntity(TModel model, TEntity? entity)
         {
-            var result = entity ??= new TEntity();
+            TEntity result = entity ?? new TEntity();
 
-            result.CopyProperties(model);
+            (result as TContract).CopyProperties(model);
             return result;
         }
 
@@ -298,7 +267,7 @@ namespace CompanyManager.WebApi.Controllers
                 var dbSet = GetDbSet(context);
                 var entity = ToEntity(model, null);
 
-                entity.CopyProperties(model);
+                (entity as TContract).CopyProperties(model);
                 dbSet.Add(entity);
                 context.SaveChanges();
 
@@ -366,7 +335,7 @@ namespace CompanyManager.WebApi.Controllers
 
                     patchModel.ApplyTo(model);
 
-                    entity.CopyProperties(model);
+                    (entity as TContract).CopyProperties(model);
                     context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));
@@ -433,6 +402,7 @@ namespace CompanyManager.WebApi.Controllers
 {
     using TModel = Models.Customer;
     using TEntity = Logic.Entities.Customer;
+    using TContract = Common.Contracts.ICustomer;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -460,6 +430,7 @@ namespace CompanyManager.WebApi.Controllers
 {
     using TModel = Models.Employee;
     using TEntity = Logic.Entities.Employee;
+    using TContract = Common.Contracts.IEmployee;
 
     [Route("api/[controller]")]
     [ApiController]
@@ -496,6 +467,8 @@ GET: https://localhost:7074/api/companies
 ```
 
 Diese Anfrage listet alle `Company`-Einträge im json-Format auf.
+
+> **ACHTUNG:** `CompanyManager.WebApi` ist eine ausführbares Projekt und benötigt eigene `AppSettings`-Dateien. Kopieren Sie die beiden `appsettings`-Dateien aus dem Projekt `CompanyManager.ConApp` in das Projekt `CompanyManager.WebApi` und passen Sie die Verbindungszeichenfolge an.
 
 ## Hilfsmittel
 

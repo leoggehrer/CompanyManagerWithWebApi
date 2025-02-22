@@ -10,6 +10,7 @@ namespace CompanyManager.WebApi.Controllers
 {
     using TModel = Models.Company;
     using TEntity = Logic.Entities.Company;
+    using TContract = Common.Contracts.ICompany;
 
     /// <summary>
     /// Controller for managing companies.
@@ -48,10 +49,16 @@ namespace CompanyManager.WebApi.Controllers
         {
             var result = new TModel();
 
-            result.CopyProperties(entity);
+            (result as TContract).CopyProperties(entity);
             if (entity.Customers != null)
             {
-                result.Customers = entity.Customers.Select(e => Models.Customer.Create(e)).ToArray();
+                result.Customers = [.. entity.Customers.Select(e => 
+                {
+                    var result = new Models.Customer();
+
+                    (result as Common.Contracts.ICustomer).CopyProperties(e);
+                    return result;
+                })];
             }
             return result;
         }
@@ -64,9 +71,9 @@ namespace CompanyManager.WebApi.Controllers
         /// <returns>The company entity.</returns>
         protected virtual TEntity ToEntity(TModel model, TEntity? entity)
         {
-            var result = entity ??= new TEntity();
+            TEntity result = entity ?? new TEntity();
 
-            result.CopyProperties(model);
+            (result as TContract).CopyProperties(model);
             return result;
         }
 
@@ -138,7 +145,7 @@ namespace CompanyManager.WebApi.Controllers
                 var dbSet = GetDbSet(context);
                 var entity = ToEntity(model, null);
 
-                entity.CopyProperties(model);
+                (entity as TContract).CopyProperties(model);
                 dbSet.Add(entity);
                 context.SaveChanges();
 
@@ -206,7 +213,7 @@ namespace CompanyManager.WebApi.Controllers
 
                     patchModel.ApplyTo(model);
 
-                    entity.CopyProperties(model);
+                    (entity as TContract).CopyProperties(model);
                     context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));

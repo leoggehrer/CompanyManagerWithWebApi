@@ -1,6 +1,4 @@
-﻿using CompanyManager.Logic.Contracts;
-using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace CompanyManager.Logic.Entities
 {
@@ -9,7 +7,7 @@ namespace CompanyManager.Logic.Entities
     /// </summary>
     [System.ComponentModel.DataAnnotations.Schema.Table("Companies")]
     [Index(nameof(Name), IsUnique = true)]
-    public class Company : EntityObject, ICompany
+    public class Company : EntityObject, Common.Contracts.ICompany
     {
         #region properties
         /// <summary>
@@ -44,19 +42,6 @@ namespace CompanyManager.Logic.Entities
         #endregion navigation properties
 
         #region methods
-        /// <summary>
-        /// Copies the properties from another company instance.
-        /// </summary>
-        /// <param name="company">The company instance to copy properties from.</param>
-        public virtual void CopyProperties(ICompany company)
-        {
-            base.CopyProperties(company);
-
-            Name = company.Name;
-            Address = company.Address;
-            Description = company.Description;
-        }
-
         /// <summary>
         /// Returns a string representation of the company.
         /// </summary>

@@ -10,6 +10,7 @@ namespace CompanyManager.WebApi.Controllers
 {
     using TModel = Models.Customer;
     using TEntity = Logic.Entities.Customer;
+    using TContract = Common.Contracts.ICustomer;
 
     /// <summary>
     /// Controller for managing customers.
@@ -47,7 +48,8 @@ namespace CompanyManager.WebApi.Controllers
         protected virtual TModel ToModel(TEntity entity)
         {
             var result = new TModel();
-            result.CopyProperties(entity);
+
+            (result as TContract).CopyProperties(entity);
             return result;
         }
 
@@ -59,8 +61,9 @@ namespace CompanyManager.WebApi.Controllers
         /// <returns>The customer entity.</returns>
         protected virtual TEntity ToEntity(TModel model, TEntity? entity)
         {
-            var result = entity ??= new TEntity();
-            result.CopyProperties(model);
+            var result = entity ?? new TEntity();
+
+            (result as TContract).CopyProperties(model);
             return result;
         }
 
@@ -128,7 +131,7 @@ namespace CompanyManager.WebApi.Controllers
                 using var context = GetContext();
                 var dbSet = GetDbSet(context);
                 var entity = ToEntity(model, null);
-                entity.CopyProperties(model);
+                (entity as TContract).CopyProperties(model);
                 dbSet.Add(entity);
                 context.SaveChanges();
                 return CreatedAtAction("Get", new { id = entity.Id }, ToModel(entity));
@@ -191,7 +194,7 @@ namespace CompanyManager.WebApi.Controllers
                 {
                     var model = ToModel(entity);
                     patchModel.ApplyTo(model);
-                    entity.CopyProperties(model);
+                    (entity as TContract).CopyProperties(model);
                     context.SaveChanges();
                 }
                 return entity == null ? NotFound() : Ok(ToModel(entity));

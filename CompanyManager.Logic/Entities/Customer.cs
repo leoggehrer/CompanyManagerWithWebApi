@@ -1,5 +1,4 @@
-﻿using CompanyManager.Logic.Contracts;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -11,7 +10,7 @@ namespace CompanyManager.Logic.Entities
     [Table("Customers")]
     [Index(nameof(Name), IsUnique = true)]
     [Index(nameof(Email), IsUnique = true)]
-    public class Customer : EntityObject, ICustomer
+    public class Customer : EntityObject, Common.Contracts.ICustomer
     {
         #region properties
         /// <summary>
@@ -40,19 +39,6 @@ namespace CompanyManager.Logic.Entities
         #endregion navigation properties
 
         #region methods
-        /// <summary>
-        /// Copies properties from another customer.
-        /// </summary>
-        /// <param name="customer">The customer to copy properties from.</param>
-        public virtual void CopyProperties(ICustomer customer)
-        {
-            base.CopyProperties(customer);
-
-            CompanyId = customer.CompanyId;
-            Name = customer.Name;
-            Email = customer.Email;
-        }
-
         /// <summary>
         /// Returns a string representation of the customer.
         /// </summary>
