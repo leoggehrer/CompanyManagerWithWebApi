@@ -46,7 +46,7 @@ namespace CompanyManager.Logic.DataContext
             employees.ToList().ForEach(e => context.EmployeeSet.Add(e));
 
             context.SaveChanges();
-#endif
         }
+#endif
     }
 }
